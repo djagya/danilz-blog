@@ -2,9 +2,9 @@ backend:
   name: git-gateway
   branch: master
 
-media_folder: "static/images/uploads"
+media_folder: "static/uploads"
 # where found in the published site
-public_folder: "/images/uploads"
+public_folder: "/uploads"
 
 collections:
   - name: "blog"
