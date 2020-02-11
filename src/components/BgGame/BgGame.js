@@ -2,9 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import SIGNS from './signs';
 import './bgGame.scss';
 import useAnimationHook from './useAnimationHook';
-import { applyTheme, diff, getRandomThemeSequences, mustAppear, randomEl, randomSigns } from './utils';
+import { applyTheme, getMatches, getNewDisplaySequence, getRandomThemeSequences, randomEl, THEMES } from './utils';
 
 const SEQ_LEN = 3;
+const GAMES_TO_LOSE = 15;
 const matchMap = getRandomThemeSequences(SEQ_LEN);
 
 /**
@@ -16,13 +17,18 @@ const matchMap = getRandomThemeSequences(SEQ_LEN);
  * "playing" - sets of random signs (with at least one from not yet inputted themes symbols) are displayed until SEQ_LEN symbols are clicked.
  * "win"/"lose" - an animation is running, switch to "init" when finished
  */
-export default function BgGame() {
+export default function BgGame({ largeGame = true }) {
   // const [state, setState] = useState('init');
   const [state, setState] = useState('playing');
   const [inputSeq, setInputSeq] = useState([]);
   const [firstSign, setFirstSign] = useState(randomEl(Object.keys(SIGNS)));
-  const [displaySeq, setDisplaySeq] = useState(randomSigns(SEQ_LEN, mustAppear(matchMap)));
+  const [closestMatch, setClosestMatch] = useState(null);
   const [activeItems, setActiveItems] = useState([0, 3]);
+  // Game - one click, at some point player loses.
+  const [gamesCount, setGamesCount] = useState(0);
+
+  const newDisplaySequence = () => getNewDisplaySequence(inputSeq, matchMap, closestMatch, SEQ_LEN);
+  const [displaySeq, setDisplaySeq] = useState(newDisplaySequence());
 
   useAnimationHook({
     state,
@@ -51,6 +57,7 @@ export default function BgGame() {
       setActiveItems([]);
       setInputSeq([]);
       setFirstSign(randomEl(Object.keys(SIGNS)));
+      setGamesCount(0);
     }
   }, [state]);
 
@@ -61,67 +68,101 @@ export default function BgGame() {
     // Find a theme which assigned signs would not differ from the entered sequence.
     // input: [moon, silver, gold], map: {theme1: [sulfur, salt, gold], theme2: [moon, silver, gold]}
     // "theme2" would be the match.
-    const match = Object.keys(matchMap).find((theme) => diff(matchMap[theme], inputSeq).length === 0);
-    if (match) {
-      setState('win');
-      applyTheme(match);
-      return;
+
+    // match: {theme, from: n, len: m}
+    const matches = getMatches(inputSeq, matchMap);
+    let themeMatch;
+    if (matches.length) {
+      const maxLenSeq = Math.max(...matches.map((m) => m.len));
+      themeMatch = matches.find((m) => m.len === maxLenSeq);
+      setClosestMatch(themeMatch);
+
+      if (themeMatch.len === SEQ_LEN) {
+        // We have a winner!
+        setState('win');
+        applyTheme(themeMatch.theme);
+        return;
+      }
     }
 
     // Allow to enter twice more than the themes sequence size to increase the chances.
-    if (inputSeq.length >= SEQ_LEN * 2) {
+    if (gamesCount >= GAMES_TO_LOSE) {
       setState('lose');
     } else {
       // Display a new set of icons, it includes at least one icon required for a theme sequence.
-      setDisplaySeq(randomSigns(SEQ_LEN, mustAppear(matchMap, inputSeq)));
-      setDisplaySeq(['vinegar', 'silver', 'wax']);
+      setDisplaySeq(getNewDisplaySequence(inputSeq, matchMap, themeMatch || closestMatch, SEQ_LEN));
     }
   }, [inputSeq]);
 
   const className = { win: '_y', lose: '_n' }[state];
 
+  const handleClick = (sign) => () => {
+    if (state === 'playing') {
+      // Append and take last SEQ_LEN elements, like a FIFO queue.
+      setInputSeq([...inputSeq, sign].slice(-SEQ_LEN));
+      setGamesCount((count) => count + 1);
+    }
+  };
+
   return (
     <>
-      {process.env.NODE_ENV === 'development' && <button
-        onClick={() => setDisplaySeq(randomSigns(SEQ_LEN, mustAppear(matchMap, inputSeq)))}
-        style={{
-          padding: 0,
-          margin: 0,
-          border: 0,
-          background: 'transparent',
-          fontSize: '0.9rem',
-          color: '#bababa',
-          position: 'absolute',
-          top: '-20px',
-          right: '-20px',
-        }}
-      >
-        ⟳
-      </button>}
+      {process.env.NODE_ENV === 'development' && (
+        <GameUtils
+          onNew={() => setDisplaySeq(newDisplaySequence())}
+          onLose={() => setState('lose')}
+          // Input first N-1 signs, new display seq will have the last one.
+          onWin={() => setInputSeq(matchMap[randomEl(THEMES)].slice(0, -1))}
+        />
+      )}
 
-      <div className="game">
+      <div className={`game ${largeGame ? 'game_large' : ''}`}>
         {state === 'init' && (
-          <SvgButton alt={firstSign} onClick={() => setState('playing')}>
+          <SvgButton className="game_init" alt={firstSign} onClick={() => setState('playing')}>
             {SIGNS[firstSign]()}
           </SvgButton>
         )}
 
         {state !== 'init' && (
-          <SymbolsSet
-            sequence={displaySeq}
-            activeIndexes={activeItems}
-            className={className}
-            onClick={(sign) => () => state === 'playing' && setInputSeq([...inputSeq, sign])}
-          />
+          <>
+            <SymbolsSet sequence={displaySeq} activeIndexes={activeItems} className={className} onClick={handleClick} />
+            <MatchDots className={className} closestMatch={closestMatch} />
+          </>
         )}
+
+        <Stats
+          gamesCount={gamesCount}
+          state={state}
+          inputSeq={inputSeq}
+          closestMatch={closestMatch}
+        />
+
+        <div className={`game__text game__text_awful ${state === 'lose' ? 'game__text_active' : ''}`}>L O S E R</div>
+        <div className={`game__text game__text_awesome ${state === 'win' ? 'game__text_active' : ''}`}>W I N N E R</div>
       </div>
     </>
   );
 }
 
+const Stats = ({ gamesCount, state, inputSeq, closestMatch }) => {
+  return (
+    <div style={{ fontSize: '0.15em', marginTop: '0.75rem' }}>
+      Games count: {gamesCount}. State: {state}.
+      <br />
+      Input: {inputSeq.join(', ')}. <br />
+      Closest match:{' '}
+      {closestMatch
+        ? `${closestMatch.theme}, ${closestMatch.len} len; ${matchMap[closestMatch.theme].join(', ')}`
+        : `No matches`}
+      . <br />
+      {closestMatch && <img src={closestMatch.src} height="50px"/>}
+    </div>
+  );
+};
+
 /**
  * 1) Display current icons sequence.
  * 2) Display N of dots, where N = max matches across all theme sequences.
+ * todo: figure out how to render dots? what does they mean?
  */
 const SymbolsSet = ({ sequence, activeIndexes, className, onClick }) => (
   <>
@@ -130,14 +171,13 @@ const SymbolsSet = ({ sequence, activeIndexes, className, onClick }) => (
         {SIGNS[sign]()}
       </SvgButton>
     ))}
-
-    <div className="game__dots">
-      {/*{[...Array(maxMatchesCount(matchMap, inputSeq)).keys()].map((v, k) => (*/}
-      {[...Array(3).keys()].map((v, k) => (
-        <MatchDot key={v} className={activeIndexes.indexOf(k) !== -1 && className} />
-      ))}
-    </div>
   </>
+);
+
+const MatchDots = ({ className, closestMatch }) => (
+  <div className="game__dots">
+    {closestMatch && [...Array.from(closestMatch.len).keys()].map((v) => <MatchDot key={v} className={className} />)}
+  </div>
 );
 
 const SvgButton = ({ alt, className, onClick, children }) => (
@@ -156,3 +196,46 @@ const MatchDot = ({ className }) => (
     </div>
   </div>
 );
+
+function GameUtils({ onNew, onLose, onWin }) {
+  return (
+    <div className="game__utils">
+      <button
+        title="New seq"
+        onClick={onNew}
+        style={{
+          padding: 0,
+          margin: 0,
+          border: 0,
+          background: 'transparent',
+        }}
+      >
+        ⟳
+      </button>
+      <button
+        title="Lose"
+        onClick={onLose}
+        style={{
+          padding: 0,
+          margin: 0,
+          border: 0,
+          background: 'transparent',
+        }}
+      >
+        ×
+      </button>
+      <button
+        title="Win"
+        onClick={onWin}
+        style={{
+          padding: 0,
+          margin: 0,
+          border: 0,
+          background: 'transparent',
+        }}
+      >
+        ✓
+      </button>
+    </div>
+  );
+}

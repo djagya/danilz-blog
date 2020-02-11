@@ -8,7 +8,7 @@ body._bg-green-line {
   background-size: 68px 112px;
 }
 
-body._bg-green-leaf {
+body._bg-leaf {
   background: url(./bg/leaf.jpg);
   background-size: 158px 158px;
 }
@@ -23,6 +23,9 @@ $dot-color: #202162;
 
 //$shadow-color: #8b1207;
 $shadow-color: #8b1207;
+
+.game {
+}
 
 .game__dots {
   display: flex;
@@ -102,9 +105,16 @@ fill: #C0951C;
   }
 }
 
+.game_init {
+  .game__button svg {
+    stroke: #000;
+    fill: #000;
+  }
+}
+
 .game__button {
-  height: 20px;
-  width: 20px;
+  height: 1em;
+  width: 1em;
   margin: 0 2px;
   padding: 0;
   border: 0;
@@ -113,15 +123,13 @@ fill: #C0951C;
   outline: 0;
 
   svg {
-    stroke: #000;
-    fill: #000;
-
-    stroke: $hover-color;
-    fill: $hover-color;
+    stroke: $lose-color;
+    fill: $lose-color;
   }
 
   &:hover svg {
-    stroke: $hover-color;
+    stroke: #000;
+    fill: #000;
   }
 
   &._y svg {
@@ -139,7 +147,55 @@ fill: #C0951C;
   }
 
   &._n svg {
-    stroke: $lose-color;
-    fill: $lose-color;
+    stroke: #000;
+    fill: #000;
+  }
+
+  &._matched {
+    background-image: linear-gradient(#8b1207, #195971);
+
+    svg {
+      stroke: #C0951C;
+      fill: #C0951C;
+    }
+  }
+}
+
+.game__text {
+  display: none;
+  font-size: 0.75rem;
+  text-align: center;
+  letter-spacing: 1px;
+
+  &.game__text_active {
+    animation: blinker 1s linear infinite;
+  }
+
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  &.game__text_awesome {
+    color: #8b1207;
+  }
+
+  &.game__text_awful {
+    color: #195971;
+  }
+}
+
+.game__utils {
+  position: absolute;
+  left: 103%;
+  display: flex;
+  flex-direction: row;
+  font-size: 0.9em;
+  height: 0.75em;
+
+  button {
+    color: #bababa;
+    cursor: pointer;
   }
 }

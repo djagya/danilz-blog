@@ -3,8 +3,9 @@ import { Link } from 'gatsby';
 
 import { rhythm, scale } from '../utils/typography';
 import BgGame from './BgGame/BgGame';
+import './layout.scss';
 
-const Layout = ({ location, title, children }) => {
+const Layout = ({ location, title, children, largeGame = true }) => {
   const rootPath = `${__PATH_PREFIX__}/`;
   let header;
 
@@ -60,7 +61,7 @@ const Layout = ({ location, title, children }) => {
         padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
       }}
     >
-      <div className="bgame-wrapper">
+      <div className={`bgame-wrapper ${largeGame ? 'bgame-wrapper_large' : ''}`}>
         <BgGame />
       </div>
       <header>{header}</header>
