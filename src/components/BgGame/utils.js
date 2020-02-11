@@ -11,8 +11,6 @@ export const FILES = {
   '_bg-leaf': bgLeaf,
 };
 
-console.log(FILES);
-
 export const randomEl = (array) => array[Math.round(Math.random() * (array.length - 1))];
 export const diff = (a = [], b = []) => a.filter((_) => b.indexOf(_) === -1);
 export const unique = (a = []) => a.filter((v, k, s) => s.indexOf(v) === k);

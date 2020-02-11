@@ -123,18 +123,14 @@ export default function BgGame({ largeGame = true }) {
         )}
 
         {state !== 'init' && (
-          <>
-            <SymbolsSet sequence={displaySeq} activeIndexes={activeItems} className={className} onClick={handleClick} />
+          <div className="game__action-panel">
+              <SymbolsSet sequence={displaySeq} activeIndexes={activeItems} className={className}
+                          onClick={handleClick} />
             <MatchDots className={className} closestMatch={closestMatch} />
-          </>
+          </div>
         )}
 
-        <Stats
-          gamesCount={gamesCount}
-          state={state}
-          inputSeq={inputSeq}
-          closestMatch={closestMatch}
-        />
+        <Stats gamesCount={gamesCount} state={state} inputSeq={inputSeq} closestMatch={closestMatch} />
 
         <div className={`game__text game__text_awful ${state === 'lose' ? 'game__text_active' : ''}`}>L O S E R</div>
         <div className={`game__text game__text_awesome ${state === 'win' ? 'game__text_active' : ''}`}>W I N N E R</div>
@@ -154,7 +150,7 @@ const Stats = ({ gamesCount, state, inputSeq, closestMatch }) => {
         ? `${closestMatch.theme}, ${closestMatch.len} len; ${matchMap[closestMatch.theme].join(', ')}`
         : `No matches`}
       . <br />
-      {closestMatch && <img src={closestMatch.src} height="50px"/>}
+      {closestMatch && <img src={closestMatch.src} height="50px" />}
     </div>
   );
 };
@@ -165,20 +161,26 @@ const Stats = ({ gamesCount, state, inputSeq, closestMatch }) => {
  * todo: figure out how to render dots? what does they mean?
  */
 const SymbolsSet = ({ sequence, activeIndexes, className, onClick }) => (
-  <>
+  <div className="game__sequence">
     {sequence.map((sign, k) => (
       <SvgButton key={sign} alt={sign} className={activeIndexes.indexOf(k) !== -1 && className} onClick={onClick(sign)}>
         {SIGNS[sign]()}
       </SvgButton>
     ))}
-  </>
-);
-
-const MatchDots = ({ className, closestMatch }) => (
-  <div className="game__dots">
-    {closestMatch && [...Array.from(closestMatch.len).keys()].map((v) => <MatchDot key={v} className={className} />)}
   </div>
 );
+
+const MatchDots = ({ className, closestMatch }) => {
+  const range = closestMatch ? [...Array(closestMatch.len).keys()] : [];
+
+  return (
+    <div className="game__dots">
+      {range.map((v) => (
+        <MatchDot key={v} className={className} />
+      ))}
+    </div>
+  );
+};
 
 const SvgButton = ({ alt, className, onClick, children }) => (
   <button title={alt || ''} className={`game__button ${className || ''}`} onClick={onClick}>

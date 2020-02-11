@@ -19,7 +19,7 @@ export default function useAnimationHook({ state, size, triggerStates = [], base
       blinkAll(2, baseSpeed * 2),
       blinkEach(10, baseSpeed * 2, true),
       blinkAll(2, baseSpeed),
-      blinkEach(4, baseSpeed / 2),
+      blinkEach(5, baseSpeed / 2),
     ];
 
     const finalPromise = sequence.reduce(

@@ -27,9 +27,23 @@ $shadow-color: #8b1207;
 .game {
 }
 
+.game__action-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.game__sequence {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
 .game__dots {
   display: flex;
   line-height: 0;
+  justify-content: center;
+  margin: 0 auto;
   margin-top: -5px;
 }
 
@@ -72,6 +86,7 @@ fill: #C0951C;
 
 .game__dot {
   flex: 0 0 33%;
+  width: 1.5em;;
 
   svg {
     position: absolute;
@@ -113,8 +128,8 @@ fill: #C0951C;
 }
 
 .game__button {
-  height: 1em;
-  width: 1em;
+  height: 1.5em;
+  width: 1.5em;
   margin: 0 2px;
   padding: 0;
   border: 0;
