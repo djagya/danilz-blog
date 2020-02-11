@@ -74,28 +74,48 @@ export default function BgGame() {
     } else {
       // Display a new set of icons, it includes at least one icon required for a theme sequence.
       setDisplaySeq(randomSigns(SEQ_LEN, mustAppear(matchMap, inputSeq)));
+      setDisplaySeq(['vinegar', 'silver', 'wax']);
     }
   }, [inputSeq]);
 
   const className = { win: '_y', lose: '_n' }[state];
 
   return (
-    <div className="game">
-      {state === 'init' && (
-        <SvgButton alt={firstSign} onClick={() => setState('playing')}>
-          {SIGNS[firstSign]()}
-        </SvgButton>
-      )}
+    <>
+      {process.env.NODE_ENV === 'development' && <button
+        onClick={() => setDisplaySeq(randomSigns(SEQ_LEN, mustAppear(matchMap, inputSeq)))}
+        style={{
+          padding: 0,
+          margin: 0,
+          border: 0,
+          background: 'transparent',
+          fontSize: '0.9rem',
+          color: '#bababa',
+          position: 'absolute',
+          top: '-20px',
+          right: '-20px',
+        }}
+      >
+        ⟳
+      </button>}
 
-      {state !== 'init' && (
-        <SymbolsSet
-          sequence={displaySeq}
-          activeIndexes={activeItems}
-          className={className}
-          onClick={(sign) => () => state === 'playing' && setInputSeq([...inputSeq, sign])}
-        />
-      )}
-    </div>
+      <div className="game">
+        {state === 'init' && (
+          <SvgButton alt={firstSign} onClick={() => setState('playing')}>
+            {SIGNS[firstSign]()}
+          </SvgButton>
+        )}
+
+        {state !== 'init' && (
+          <SymbolsSet
+            sequence={displaySeq}
+            activeIndexes={activeItems}
+            className={className}
+            onClick={(sign) => () => state === 'playing' && setInputSeq([...inputSeq, sign])}
+          />
+        )}
+      </div>
+    </>
   );
 }
 
@@ -129,7 +149,7 @@ const SvgButton = ({ alt, className, onClick, children }) => (
 const MatchDot = ({ className }) => (
   <div className={`game__dot ${className || ''}`}>
     <div className="game__dot__wrapper">
-      <div className="game__dot__shade"/>
+      <div className="game__dot__shade" />
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
         <circle cx="26" cy="26" r="24" />
       </svg>

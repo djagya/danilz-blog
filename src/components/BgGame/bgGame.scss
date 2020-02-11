@@ -16,7 +16,13 @@ body._bg-green-leaf {
 $hover-color: #8b1207;
 $win-color: #2a7458;
 $lose-color: #8b1207;
-$dot-color: #1b375b;
+//$dot-color: #1b375b;
+//$dot-color: #0b3ca0;
+//$dot-color: #202162;
+$dot-color: #202162;
+
+//$shadow-color: #8b1207;
+$shadow-color: #8b1207;
 
 .game__dots {
   display: flex;
@@ -38,11 +44,28 @@ $dot-color: #1b375b;
   top: 40%;
   right: 45%;
   border-radius: 50%;
-  box-shadow: 0 0 2px 2px $hover-color;
-  background-color: $hover-color;
+  box-shadow: 0 0 2px 2px $shadow-color;
+  background-color: $shadow-color;
 
   //stroke: #5B7116;
 }
+
+/*
+// todo: colors for dot appearing on selecting a matching element
+// slow transition to the default color with fade in animation
+//
+// .game__dot__shade {
+// #8b1207
+//box-shadow: 0 0 2px 2px $hover-color;
+//background-color: $hover-color;
+// }
+//
+//.game__dot svg {
+fill: #C0951C;
+    opacity: 0.6;
+// }
+
+ */
 
 .game__dot {
   flex: 0 0 33%;
@@ -91,6 +114,10 @@ $dot-color: #1b375b;
 
   svg {
     stroke: #000;
+    fill: #000;
+
+    stroke: $hover-color;
+    fill: $hover-color;
   }
 
   &:hover svg {
@@ -108,9 +135,11 @@ $dot-color: #1b375b;
     //stroke: #1D6064; // same, but greenier, looks complex and nice
     //stroke: #246F49; // another nice gree, best match with the dot color
     stroke: #27763c; // same as above, but more warm magic
+    fill: #27763c;
   }
 
   &._n svg {
     stroke: $lose-color;
+    fill: $lose-color;
   }
 }
