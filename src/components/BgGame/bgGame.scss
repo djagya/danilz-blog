@@ -14,30 +14,46 @@ body._bg-green-leaf {
 }
 
 $hover-color: #8b1207;
-$win-color: #43a11e;
+$win-color: #2a7458;
 $lose-color: #8b1207;
-$dot-color: #215294; /* #c2cfe1; #d0d0d0; */
+$dot-color: #1b375b;
 
-.bgame__dots {
+.game__dots {
   display: flex;
   line-height: 0;
   margin-top: -5px;
 }
 
-.bgame__dot__wrapper {
-  height: 4px;
-  width: 4px;
+.game__dot__wrapper {
+  position: relative;
+  height: 7px;
+  width: 7px;
   margin: 0 auto;
-  border-radius: 50%;
-  box-shadow: 0 0 2px 0 $hover-color;
 }
 
-.bgame__dot {
+.game__dot__shade {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  top: 40%;
+  right: 45%;
+  border-radius: 50%;
+  box-shadow: 0 0 2px 2px $hover-color;
+  background-color: $hover-color;
+
+  //stroke: #5B7116;
+}
+
+.game__dot {
   flex: 0 0 33%;
 
   svg {
-    vertical-align: middle;
+    position: absolute;
+    height: 7px;
+    width: 7px;
+    top: -0.5px;
     fill: $dot-color;
+    opacity: 0.6;
   }
 
   &._y {
@@ -45,8 +61,9 @@ $dot-color: #215294; /* #c2cfe1; #d0d0d0; */
       fill: $win-color;
     }
 
-    .bgame__dot__wrapper {
-      box-shadow: 0 0 2px 0 $win-color;
+    .game__dot__shade {
+      box-shadow: 0 0 3px 3px #5b7116;
+      background-color: #5b7116;
     }
   }
 
@@ -55,13 +72,14 @@ $dot-color: #215294; /* #c2cfe1; #d0d0d0; */
       fill: $lose-color;
     }
 
-    .bgame__dot__wrapper {
-      box-shadow: 0 0 2px 0 $lose-color;
+    .game__dot__shade {
+      box-shadow: 0 0 3px 3px $lose-color;
+      background-color: $lose-color;
     }
   }
 }
 
-.bgame__button {
+.game__button {
   height: 20px;
   width: 20px;
   margin: 0 2px;
@@ -80,7 +98,16 @@ $dot-color: #215294; /* #c2cfe1; #d0d0d0; */
   }
 
   &._y svg {
-    stroke: #43a11e;
+    //stroke: #636114; // !
+    //stroke: #538119; // maybe, too simple
+    //stroke: #1b375b; // interesting blue, good combination with green
+    //stroke: #C0951C; // cool orange, but doesn't suite by meaning
+    //stroke: #5CA02B; // nice light green, feels good
+    //stroke: #459226; // another nice, darker
+    //stroke: #195971; // nice bluish
+    //stroke: #1D6064; // same, but greenier, looks complex and nice
+    //stroke: #246F49; // another nice gree, best match with the dot color
+    stroke: #27763c; // same as above, but more warm magic
   }
 
   &._n svg {

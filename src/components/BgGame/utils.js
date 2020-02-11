@@ -35,3 +35,8 @@ export function applyTheme(theme) {
   classList.add(theme);
 }
 
+export function getRandomThemeSequences(length) {
+  return THEMES.reduce((map, theme) => {
+    return { ...map, [theme]: randomSigns(length) };
+  }, {});
+}
