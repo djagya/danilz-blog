@@ -1,11 +1,12 @@
-import React from "react"
-import { Link } from "gatsby"
+import React from 'react';
+import { Link } from 'gatsby';
 
-import { rhythm, scale } from "../utils/typography"
+import { rhythm, scale } from '../utils/typography';
+import BgGame from './BgGame/BgGame';
 
 const Layout = ({ location, title, children }) => {
-  const rootPath = `${__PATH_PREFIX__}/`
-  let header
+  const rootPath = `${__PATH_PREFIX__}/`;
+  let header;
 
   if (location.pathname === rootPath) {
     header = (
@@ -27,7 +28,7 @@ const Layout = ({ location, title, children }) => {
           {title}
         </Link>
       </h1>
-    )
+    );
   } else {
     header = (
       <h3
@@ -47,10 +48,11 @@ const Layout = ({ location, title, children }) => {
           {title}
         </Link>
       </h3>
-    )
+    );
   }
   return (
     <div
+      className="app"
       style={{
         marginLeft: `auto`,
         marginRight: `auto`,
@@ -58,6 +60,9 @@ const Layout = ({ location, title, children }) => {
         padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
       }}
     >
+      <div className="bgame-wrapper">
+        <BgGame />
+      </div>
       <header>{header}</header>
       <main>{children}</main>
       <footer>
@@ -66,7 +71,7 @@ const Layout = ({ location, title, children }) => {
         <a href="https://www.gatsbyjs.org">Gatsby</a>
       </footer>
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

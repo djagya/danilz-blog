@@ -1,0 +1,89 @@
+body {
+  background: url(./bg/dark-red.png);
+  background-size: 283px 120px;
+}
+
+body._bg-green-line {
+  background: url(./bg/green-line.jpg);
+  background-size: 68px 112px;
+}
+
+body._bg-green-leaf {
+  background: url(./bg/leaf.jpg);
+  background-size: 158px 158px;
+}
+
+$hover-color: #8b1207;
+$win-color: #43a11e;
+$lose-color: #8b1207;
+$dot-color: #215294; /* #c2cfe1; #d0d0d0; */
+
+.bgame__dots {
+  display: flex;
+  line-height: 0;
+  margin-top: -5px;
+}
+
+.bgame__dot__wrapper {
+  height: 4px;
+  width: 4px;
+  margin: 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 0 2px 0 $hover-color;
+}
+
+.bgame__dot {
+  flex: 0 0 33%;
+
+  svg {
+    vertical-align: middle;
+    fill: $dot-color;
+  }
+
+  &._y {
+    svg {
+      fill: $win-color;
+    }
+
+    .bgame__dot__wrapper {
+      box-shadow: 0 0 2px 0 $win-color;
+    }
+  }
+
+  &._n {
+    svg {
+      fill: $lose-color;
+    }
+
+    .bgame__dot__wrapper {
+      box-shadow: 0 0 2px 0 $lose-color;
+    }
+  }
+}
+
+.bgame__button {
+  height: 20px;
+  width: 20px;
+  margin: 0 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  outline: 0;
+
+  svg {
+    stroke: #000;
+  }
+
+  &:hover svg {
+    stroke: $hover-color;
+  }
+
+  &._y svg {
+    stroke: #43a11e;
+  }
+
+  &._n svg {
+    stroke: $lose-color;
+  }
+}

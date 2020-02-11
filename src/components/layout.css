@@ -1,0 +1,10 @@
+.app {
+    background: #ececeb;
+    position: relative;
+}
+
+.bgame-wrapper {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
