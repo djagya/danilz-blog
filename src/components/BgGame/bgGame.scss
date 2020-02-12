@@ -200,8 +200,9 @@ $shadow-color: #202162;
 
   &._y {
     svg {
-      fill: #5b7116;
+      fill: $win-color;
       //fill: $dot-color;
+      opacity: .85;
     }
 
     .game__dot__shade {
