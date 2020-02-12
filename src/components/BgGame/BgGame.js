@@ -93,7 +93,6 @@ export default function BgGame({ large = false, debug = false }) {
     } else {
       setDisplaySeq(randomSigns(SEQ_LEN, themeMatch ? [themeMatch['next']] : flatList(matchMap)));
     }
-
   }, [inputSeq.toString()]);
 
   const handleClick = (sign) => () => {
@@ -162,7 +161,7 @@ const SymbolsSet = ({ sequence, highlightEl, activeIndexes, isAnimating, isInit,
   <div className={cx('game__sequence', !isInit && '_playing', isAnimating && '_animating')}>
     {sequence.map((sign, k) => (
       <SvgButton
-        key={sign}
+        key={sign + k}
         alt={sign}
         className={cx(
           isInit && k === 0 && '_init',
