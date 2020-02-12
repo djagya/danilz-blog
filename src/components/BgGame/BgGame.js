@@ -48,6 +48,7 @@ export default function BgGame({ large = false, debug = false }) {
     onUpdate: useCallback((v) => setActiveItems(v), [setActiveItems]),
     onEnd: useCallback(() => {
       setState('resetting');
+      setClosestMatch(null);
       setTimeout(() => setState('init'), 1000);
     }, [setState]),
   });
