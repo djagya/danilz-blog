@@ -17,5 +17,11 @@
     color: white;
     padding: 1.5rem;
     right: 0;
+
+    .game__dot {
+      svg {
+        fill: white;
+      }
+    }
   }
 }

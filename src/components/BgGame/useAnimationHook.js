@@ -5,21 +5,18 @@ const ANIM_SPEED = 250;
 /**
  * Animate icons when a game state switches to the one of the specified trigger states.
  */
-export default function useAnimationHook({ state, size, triggerStates = [], baseSpeed = ANIM_SPEED, onUpdate, onEnd }) {
+export default function useAnimationHook({ state, size, triggerState, baseSpeed = ANIM_SPEED, onUpdate, onEnd }) {
   // timers and intervals
   const workerIds = useRef([]);
-
-  const statesDep = triggerStates.toString();
   useEffect(() => {
-    if (triggerStates.indexOf(state) === -1) {
+    if (state !== triggerState) {
       return;
     }
 
     const sequence = [
-      blinkAll(2, baseSpeed * 2),
-      blinkEach(10, baseSpeed * 2, true),
-      blinkAll(2, baseSpeed),
-      blinkEach(5, baseSpeed / 2),
+      blinkAll(3, baseSpeed),
+      blinkEach(11, baseSpeed, true),
+      blinkAll(3, baseSpeed),
     ];
 
     const finalPromise = sequence.reduce(
@@ -32,7 +29,7 @@ export default function useAnimationHook({ state, size, triggerStates = [], base
       // Stop all with the same function (allowed but confusing), remove from the list.
       workerIds.current = workerIds.current.filter((_) => clearTimeout(_));
     };
-  }, [state, size, statesDep, baseSpeed, onUpdate, onEnd]);
+  }, [state, size, triggerState, baseSpeed, onUpdate, onEnd]);
 }
 
 /**

@@ -14,6 +14,7 @@ export const FILES = {
 export const randomEl = (array) => array[Math.round(Math.random() * (array.length - 1))];
 export const diff = (a = [], b = []) => a.filter((_) => b.indexOf(_) === -1);
 export const unique = (a = []) => a.filter((v, k, s) => s.indexOf(v) === k);
+export const flatList = (map) => Object.keys(map).flatMap(k => map[k]);
 
 export function randomSigns(length = 3, mustHave = []) {
   const seq = [];
@@ -23,6 +24,9 @@ export function randomSigns(length = 3, mustHave = []) {
       seq.push(el);
     }
   }
+
+  console.log(`generated, expected one of (${mustHave}): ${seq}`);
+
   return seq;
 }
 
@@ -53,7 +57,7 @@ export function findSubsequence(inputSeq, matchSeq, theme) {
     }
     subSeqLen += 1;
   }
-  return subSeqLen ? { theme, from: firstMatch, len: subSeqLen, src: FILES[theme] } : null;
+  return subSeqLen ? { theme, from: firstMatch, len: subSeqLen, next: matchSeq[subSeqLen], src: FILES[theme] } : null;
 }
 
 // Matches must follow in the exact same order as encoded sequences.
@@ -62,16 +66,4 @@ export function getMatches(inputSeq, matchMap) {
     const matchSequence = findSubsequence(inputSeq, matchMap[theme], theme);
     return matchSequence ? [...matches, matchSequence] : matches;
   }, []);
-}
-
-/**
- * If closesMatch exists, force one of the match missing signs to appear.
- */
-export function getNewDisplaySequence(inputSeq, matchMap, closestMatch, length) {
-  // Subset of signs available to appear in the next display sequence.
-  const subset = closestMatch
-    ? matchMap[closestMatch.theme]
-    : unique(Object.keys(matchMap).flatMap((_) => matchMap[_]));
-
-  return randomSigns(length, diff(subset, inputSeq));
 }

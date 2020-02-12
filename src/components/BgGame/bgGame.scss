@@ -13,23 +13,49 @@ body._bg-leaf {
   background-size: 158px 158px;
 }
 
-$hover-color: #8b1207;
-$win-color: #2a7458;
-$lose-color: #8b1207;
-//$dot-color: #1b375b;
-//$dot-color: #0b3ca0;
+$icon-size: 1.5em;
+$dot-size: 0.25em;
+
+$red: #8b1207;
+$icon-color: $red;
+//$icon-color-init: #bababa;
+$icon-color-init: #b39b99;
+//$hover-color: #8b1207;
+//$hover-color: #202162;
+$hover-color: #2aa11f;
+
+$win-color: #27763c;
+//$win-color: #2aa11f;
+
+//$lose-color: #8b1207;
+//$lose-color: #ab6114;
+$lose-color: $red;
+$dot-color: #bdbdbd;
 //$dot-color: #202162;
-$dot-color: #202162;
+
+//$dot-color: #bdbdbd;
+//$dot-color: #eeeeee;
+//$dot-color: #f5f5f5;
+//$dot-color: #efebe9;
 
 //$shadow-color: #8b1207;
-$shadow-color: #8b1207;
+$shadow-color: #202162;
 
-.game {
+.game__dot__shade {
+  display: none;
 }
 
-.game__action-panel {
+.game {
   display: flex;
-  flex-direction: column;
+}
+
+.game__side {
+  margin-right: 6px;
+}
+
+.game__main {
+  flex: 1 0 auto;
+  overflow: hidden;
 }
 
 .game__sequence {
@@ -37,34 +63,262 @@ $shadow-color: #8b1207;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
+
+  margin-right: -$icon-size * 2.5;
+  transition-property: margin-right;
+  transition-duration: 700ms;
+  transition-timing-function: linear;
+
+  &._playing {
+    margin-right: 0;
+  }
+
+  &._animating {
+    svg {
+      fill: $icon-color-init;
+      stroke: $icon-color-init;
+      transition-duration: 30ms;
+    }
+
+    .game__button {
+      // Disable hover
+      pointer-events: none;
+    }
+  }
+}
+
+.game__button {
+  height: $icon-size;
+  width: $icon-size;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  outline: 0;
+
+  & + & {
+    margin-left: 6px;
+  }
+
+  svg {
+    stroke: $icon-color;
+    fill: $icon-color;
+
+    transition-property: stroke, fill;
+    transition-duration: 200ms;
+  }
+
+  &._init svg {
+    fill: $icon-color-init;
+    stroke: $icon-color-init;
+    opacity: 0.25;
+  }
+
+  &:hover svg {
+    stroke: $hover-color;
+    fill: $hover-color;
+    opacity: 1;
+  }
+
+  &._choose svg {
+    $c:  mix($icon-color, #4527a0, 75%);
+    stroke: $c;
+    fill: $c;
+  }
+
+  &._y svg {
+    //stroke: #636114; // !
+    //stroke: #538119; // maybe, too simple
+    //stroke: #1b375b; // interesting blue, good combination with green
+    //stroke: #C0951C; // cool orange, but doesn't suite by meaning
+    //stroke: #5CA02B; // nice light green, feels good
+    //stroke: #459226; // another nice, darker
+    //stroke: #195971; // nice bluish
+    //stroke: #1D6064; // same, but greenier, looks complex and nice
+    //stroke: #246F49; // another nice gree, best match with the dot color
+
+    //stroke: #27763c; // same as above, but more warm magic
+    //fill: #27763c;
+
+    fill: $win-color;
+    stroke: $win-color;
+
+    transition-duration: 50ms;
+  }
+
+  &._n svg {
+    stroke: $lose-color;
+    fill: $lose-color;
+
+    transition-duration: 50ms;
+  }
 }
 
 .game__dots {
   display: flex;
   line-height: 0;
-  justify-content: center;
   margin: 0 auto;
-  margin-top: -5px;
+  margin-top: 3px;
+
+  width: $icon-size * 3;
+
+  &.game__dots_side {
+    width: unset;
+    flex-direction: column;
+    margin-top: 0;
+
+    .game__dot {
+      flex-basis: $icon-size / 3;
+    }
+
+    .game__dot__wrapper {
+      display: inline-flex;
+    }
+  }
+}
+
+.game__dot {
+  flex: 0 0 33%;
+
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(.76, .05, .86, .06);
+
+  &.game__dot_on {
+    opacity: 1;
+  }
+
+  svg {
+    position: absolute;
+    // To fix
+    height: calc(#{$dot-size} + 1px);
+    width: $dot-size;
+    fill: $dot-color;
+    opacity: 0.5;
+  }
+
+  &._y {
+    svg {
+      fill: #5b7116;
+      //fill: $dot-color;
+    }
+
+    .game__dot__shade {
+      //display: block;
+      //box-shadow: 0 0 4px 2px #5b7116;
+      //box-shadow: 0 0 2px 2px #5b7116;
+      //box-shadow: 0 0 3px 2px $shadow-color;
+      background-color: $win-color;
+      opacity: 0.7;
+    }
+  }
+
+  &._n {
+    svg {
+      fill: $lose-color;
+    }
+
+    .game__dot__shade {
+      box-shadow: 0 0 3px 3px $lose-color;
+      background-color: $lose-color;
+    }
+  }
 }
 
 .game__dot__wrapper {
   position: relative;
-  height: 7px;
-  width: 7px;
+  height: $dot-size;
+  width: $dot-size;
   margin: 0 auto;
+
+  // To align the dot and its shadow
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .game__dot__shade {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  top: 40%;
-  right: 45%;
+  width: .1px;
+  height: .1px;
   border-radius: 50%;
-  box-shadow: 0 0 2px 2px $shadow-color;
+  box-shadow: 0 0 3px 2px $shadow-color;
   background-color: $shadow-color;
 
   //stroke: #5B7116;
+}
+
+.game__guessed {
+  display: flex;
+  flex-direction: column;
+
+  .game__guessed__sign {
+    height: $icon-size / 3;
+    width: $icon-size / 3;
+  }
+
+  .game__guessed__sign-wrapper {
+    padding: 0.03em;
+  }
+
+  ._matched {
+    //height: $icon-size / 3;
+    //width: $icon-size / 3;
+    background-image: linear-gradient(#8b1207, #195971);
+
+    svg {
+      display: block;
+      stroke: #c0951c;
+      fill: #c0951c;
+    }
+  }
+}
+
+.game__text {
+  margin-top: 0.25em;
+  font-size: 1em;
+  font-family: monospace;
+  text-align: center;
+  z-index: 10;
+
+  animation: blinker 1.5s ease-in-out infinite;
+  animation-delay: 1s;
+
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  &._awesome {
+    color: $win-color;
+  }
+
+  &._awful {
+    color: $red;
+  }
+}
+
+.game__debug {
+  position: absolute;
+  right: 0;
+  bottom: -40px;
+  background-color: #bdbdbd;
+  padding: 2px;
+  border-radius: 2px;
+}
+
+.game__utils {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.9em;
+  line-height: 0.9em;
+
+  button {
+    color: #333;
+    cursor: pointer;
+  }
 }
 
 /*
@@ -83,134 +337,3 @@ fill: #C0951C;
 // }
 
  */
-
-.game__dot {
-  flex: 0 0 33%;
-  width: 1.5em;;
-
-  svg {
-    position: absolute;
-    height: 7px;
-    width: 7px;
-    top: -0.5px;
-    fill: $dot-color;
-    opacity: 0.6;
-  }
-
-  &._y {
-    svg {
-      fill: $win-color;
-    }
-
-    .game__dot__shade {
-      box-shadow: 0 0 3px 3px #5b7116;
-      background-color: #5b7116;
-    }
-  }
-
-  &._n {
-    svg {
-      fill: $lose-color;
-    }
-
-    .game__dot__shade {
-      box-shadow: 0 0 3px 3px $lose-color;
-      background-color: $lose-color;
-    }
-  }
-}
-
-.game_init {
-  .game__button svg {
-    stroke: #000;
-    fill: #000;
-  }
-}
-
-.game__button {
-  height: 1.5em;
-  width: 1.5em;
-  margin: 0 2px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  outline: 0;
-
-  svg {
-    stroke: $lose-color;
-    fill: $lose-color;
-  }
-
-  &:hover svg {
-    stroke: #000;
-    fill: #000;
-  }
-
-  &._y svg {
-    //stroke: #636114; // !
-    //stroke: #538119; // maybe, too simple
-    //stroke: #1b375b; // interesting blue, good combination with green
-    //stroke: #C0951C; // cool orange, but doesn't suite by meaning
-    //stroke: #5CA02B; // nice light green, feels good
-    //stroke: #459226; // another nice, darker
-    //stroke: #195971; // nice bluish
-    //stroke: #1D6064; // same, but greenier, looks complex and nice
-    //stroke: #246F49; // another nice gree, best match with the dot color
-    stroke: #27763c; // same as above, but more warm magic
-    fill: #27763c;
-  }
-
-  &._n svg {
-    stroke: #000;
-    fill: #000;
-  }
-
-  &._matched {
-    background-image: linear-gradient(#8b1207, #195971);
-
-    svg {
-      stroke: #C0951C;
-      fill: #C0951C;
-    }
-  }
-}
-
-.game__text {
-  display: none;
-  font-size: 0.75rem;
-  text-align: center;
-  letter-spacing: 1px;
-
-  &.game__text_active {
-    animation: blinker 1s linear infinite;
-  }
-
-  @keyframes blinker {
-    50% {
-      opacity: 0;
-    }
-  }
-
-  &.game__text_awesome {
-    color: #8b1207;
-  }
-
-  &.game__text_awful {
-    color: #195971;
-  }
-}
-
-.game__utils {
-  position: absolute;
-  left: 103%;
-  display: flex;
-  flex-direction: row;
-  font-size: 0.9em;
-  height: 0.75em;
-
-  button {
-    color: #bababa;
-    cursor: pointer;
-  }
-}

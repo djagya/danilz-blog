@@ -5,7 +5,7 @@ import { rhythm, scale } from '../utils/typography';
 import BgGame from './BgGame/BgGame';
 import './layout.scss';
 
-const Layout = ({ location, title, children, largeGame = true }) => {
+const Layout = ({ location, title, children, largeGame = false }) => {
   const rootPath = `${__PATH_PREFIX__}/`;
   let header;
 
@@ -62,7 +62,7 @@ const Layout = ({ location, title, children, largeGame = true }) => {
       }}
     >
       <div className={`bgame-wrapper ${largeGame ? 'bgame-wrapper_large' : ''}`}>
-        <BgGame />
+        <BgGame large={largeGame}/>
       </div>
       <header>{header}</header>
       <main>{children}</main>

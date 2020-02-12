@@ -24,7 +24,7 @@ export default {
   // silver
   moon: () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127 127">
-      <path fill="none" strokeWidth="5" strokeLinejoin="round" d="m20,28 a 52,52 0 1,1 0,78 a 41,41 0 1,0 0-78 l 2-2" />
+      <path fill="none" strokeWidth="5" strokeLinejoin="round" d="m23,23 a 52,52 0 1,1 0,78 a 41,41 0 1,0 0-78 l 2-2" />
     </svg>
   ),
   silver: () => (
