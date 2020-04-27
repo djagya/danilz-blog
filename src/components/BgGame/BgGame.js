@@ -23,6 +23,11 @@ const matchMap = getRandomThemeSequences(SEQ_LEN);
  * A mini game to switch the page background when entered a sequence of symbols matching an encoded body theme.
  * Where a theme is encoded like so: [moon, salt, silver].
  *
+ * todo: after first win fade in a minimalistic graph (like bustabit) tracking wins (+1) and loses (-1)
+ * show N (e.g. 5) on that graph. the graph is below the symbols.
+ * todo: after the first win reset the game directly to "playing" after win/lose
+ * todo: MAAAYBE select a random sequence to guess per game.
+ *
  * States:
  * "init" - a random sign is displayed, start game on click
  * "playing" - sets of random signs (with at least one from not yet inputted themes symbols) are displayed until SEQ_LEN symbols are clicked.
@@ -80,15 +85,11 @@ export default function BgGame({ large = false, debug = false }) {
       setState('playing');
     }
 
-    let themeMatch = null;
-    const matches = getMatches(inputSeq, matchMap);
-    if (matches.length) {
-      const maxLenSeq = Math.max(...matches.map((m) => m.len));
-      themeMatch = matches.find((m) => m.len === maxLenSeq);
-    }
+    const themeMatch = getThemeMatch(inputSeq);
     setClosestMatch(themeMatch);
 
     if (themeMatch && themeMatch['len'] === SEQ_LEN) {
+      // Guessed all.
       setState('finished');
       applyTheme(themeMatch.theme);
     } else {
@@ -102,10 +103,24 @@ export default function BgGame({ large = false, debug = false }) {
     }
     if (state === 'playing') {
       // Append and take last SEQ_LEN elements, like a FIFO queue.
-      setInputSeq([...inputSeq, sign].slice(-SEQ_LEN));
-      setGamesCount((count) => count + 1);
+      const seq = [...inputSeq, sign].slice(-SEQ_LEN);
+      setInputSeq(seq);
+      const themeMatch = getThemeMatch(seq);
+      // Don't count last games if guessed a sign - to allow the player to use that last chance to guess a whole seq.
+      if ((!closestMatch || themeMatch?.theme !== closestMatch.theme) && gamesCount < GAMES_TO_LOSE - 1) {
+        setGamesCount((count) => count + 1);
+      }
     }
   };
+
+  function getThemeMatch(seq) {
+    const matches = getMatches(seq, matchMap);
+    if (!matches.length) {
+      return null;
+    }
+    const maxLenSeq = Math.max(...matches.map((m) => m.len));
+    return matches.find((m) => m.len === maxLenSeq);
+  }
 
   // todo: maybe replace the whole sequence with EndText (with fade animation) - tidy
   return (
@@ -166,7 +181,7 @@ const SymbolsSet = ({ sequence, highlightEl, activeIndexes, isAnimating, isInit,
         alt={sign}
         className={cx(
           isInit && k === 0 && '_init',
-          highlightEl === sign && '_choose',
+          highlightEl === sign && '_choose', // debug class to show next correct button
           activeIndexes.indexOf(k) !== -1 && className,
         )}
         onClick={onClick(sign)}

@@ -11,7 +11,7 @@ import Image from 'gatsby-image';
 
 import { rhythm } from '../utils/typography';
 
-const Bio = ({style}) => {
+const Bio = ({ visible, style }) => {
   const data = useStaticQuery(graphql`
     query BioQuery {
       avatar: file(absolutePath: { regex: "/profile-pic.jpg/" }) {
@@ -34,7 +34,11 @@ const Bio = ({style}) => {
 
   const { author, social } = data.site.siteMetadata;
   return (
-    <div style={style}>
+    <div className={visible ? '' : '_hidden'} style={style}>
+      <h3>
+        Here and there
+      </h3>
+
       <div style={{ display: 'flex' }}>
         <Image
           fixed={data.avatar.childImageSharp.fixed}
@@ -49,11 +53,11 @@ const Bio = ({style}) => {
             borderRadius: `50%`,
           }}
         />
-        <p style={{marginBottom: rhythm(1/2)}}>
+        <p style={{ marginBottom: rhythm(1 / 2) }}>
           Попытка документировать результаты узнавания и разбирания – для себя, для других.
         </p>
       </div>
-      <div style={{color: '#9e9e9e', fontSize: rhythm(0.5)}}>
+      <div style={{ color: '#9e9e9e', fontSize: rhythm(0.5) }}>
         <a href={`https://soundcloud.com/${social.soundcloud}`}>
           My SoundCloud
         </a>{' '}/{' '}

@@ -11,4 +11,3 @@ I'm sure I'll write a lot more interesting things in the future.
 For now observe this blue sky I've photographed on a sunny summer day.
 
 ![Welcome Sky](/uploads/sky.jpg)
-![](/uploads/theme-icon.png)

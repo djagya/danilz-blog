@@ -1,0 +1,4 @@
+Actual on 26.04:
+- Minimalistic graph showing #points, green-red plot line reflecting points changing
+- Refine game state after the first win (when the graph appears)
+- Change font

@@ -1,4 +1,9 @@
 body {
+  background: url(./bg/leaf.jpg);
+  background-size: 158px 158px;
+}
+
+body._bg-main {
   background: url(./bg/dark-red.png);
   background-size: 283px 120px;
 }
@@ -66,7 +71,7 @@ $shadow-color: #202162;
 
   margin-right: -$icon-size * 2.5;
   transition-property: margin-right;
-  transition-duration: 700ms;
+  transition-duration: 600ms;
   transition-timing-function: linear;
 
   &._playing {
@@ -121,7 +126,7 @@ $shadow-color: #202162;
   }
 
   &._choose svg {
-    $c:  mix($icon-color, #4527a0, 75%);
+    $c: mix($icon-color, #4527a0, 75%);
     stroke: $c;
     fill: $c;
   }
@@ -183,7 +188,7 @@ $shadow-color: #202162;
   opacity: 0;
   transition-property: opacity;
   transition-duration: 200ms;
-  transition-timing-function: cubic-bezier(.76, .05, .86, .06);
+  transition-timing-function: ease-in;
 
   &.game__dot_on {
     opacity: 1;

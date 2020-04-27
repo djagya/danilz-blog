@@ -1,76 +1,46 @@
 import React from 'react';
 import { Link } from 'gatsby';
-
-import { rhythm, scale } from '../utils/typography';
 import BgGame from './BgGame/BgGame';
 import './layout.scss';
+import { cx } from '../utils/ui';
 
 const Layout = ({ location, title, children, largeGame = false }) => {
-  const rootPath = `${__PATH_PREFIX__}/`;
-  let header;
-
-  if (location.pathname === rootPath) {
-    header = (
-      <h1
-        style={{
-          ...scale(1),
-          marginBottom: rhythm(1),
-          marginTop: 0,
-        }}
-      >
-        <Link
-          style={{
-            boxShadow: `none`,
-            textDecoration: `none`,
-            color: `inherit`,
-          }}
-          to={`/`}
-        >
-          {title}
-        </Link>
-      </h1>
-    );
-  } else {
-    header = (
-      <h3
-        style={{
-          fontFamily: `Montserrat, sans-serif`,
-          marginTop: 0,
-        }}
-      >
-        <Link
-          style={{
-            boxShadow: `none`,
-            textDecoration: `none`,
-            color: `inherit`,
-          }}
-          to={`/`}
-        >
-          {title}
-        </Link>
-      </h3>
-    );
-  }
   return (
-    <div
-      className="app"
-      style={{
-        marginLeft: `auto`,
-        marginRight: `auto`,
-        maxWidth: rhythm(24),
-        padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
-      }}
-    >
-      <div className={`bgame-wrapper ${largeGame ? 'bgame-wrapper_large' : ''}`}>
-        <BgGame large={largeGame}/>
-      </div>
-      <header>{header}</header>
+    <div className="app">
+      <header>
+        <div className={cx('bgame-wrapper', largeGame && 'bgame-wrapper_large')}>
+          <BgGame large={largeGame} />
+        </div>
+
+        <div className="title-wrapper">
+          <h1>
+            <Link
+              style={{
+                boxShadow: `none`,
+                textDecoration: `none`,
+                color: `inherit`,
+              }}
+              to={`/`}
+            >
+              {title}
+            </Link>
+          </h1>
+          <div className="square" />
+        </div>
+
+        <div className="menu">
+          <a href="https://soundcloud.com/djagya" target="_blank">
+            SC
+          </a>
+          <a href="https://t.me/listening_now" target="_blank">
+            TG
+          </a>
+        </div>
+
+        <hr className="separator" />
+      </header>
       <main>{children}</main>
-      <footer>
-        © {new Date().getFullYear()}, Built with
-        {` `}
-        <a href="https://www.gatsbyjs.org">Gatsby</a>
-      </footer>
+      <footer></footer>
     </div>
   );
 };

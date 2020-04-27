@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, graphql } from 'gatsby';
+import { graphql, Link } from 'gatsby';
 
 import Bio from '../components/bio';
 import Layout from '../components/layout';
@@ -9,12 +9,15 @@ import { rhythm } from '../utils/typography';
 const BlogIndex = ({ data, location }) => {
   const siteTitle = data.site.siteMetadata.title;
   const posts = data.allMarkdownRemark.edges;
+  const showBio = false;
 
   return (
     <Layout location={location} title={siteTitle}>
       <SEO title="All posts" />
-      <Bio style={{marginBottom: rhythm(1.5)}} />
-      <hr className="separator" style={{marginBottom: rhythm(1.5)}} />
+
+      <div>
+        <Bio visible={showBio} />
+      </div>
 
       {posts.map(({ node }) => {
         const title = node.frontmatter.title || node.fields.slug;

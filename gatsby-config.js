@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: `Here and there by Danil Zakablukovskii`,
+    title: `Danil Zakablukovskii`,
     author: `Danil Zakablukovskii`,
     description: `A personal blog: research notes, thoughts, размышления`,
     siteUrl: `https://danilz.me/blog`,
