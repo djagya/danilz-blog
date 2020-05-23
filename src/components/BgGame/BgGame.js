@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import Loadable from '@loadable/component';
 import SIGNS from './signs';
 import './bgGame.scss';
 import useAnimationHook from './useAnimationHook';
@@ -14,7 +15,6 @@ import {
 } from './utils';
 import { GameUtils } from './devUtils';
 import { cx } from '../../utils/ui';
-import { PointsPlot } from './PointsPlot';
 
 const STATE_INIT = 'init';
 const STATE_PLAY = 'playing';
@@ -24,6 +24,8 @@ const GAMES_TO_LOSE = 10;
 
 const matchMap = getRandomThemeSequences(SEQ_LEN);
 const isDev = process.env.NODE_ENV === 'development';
+
+const PointsPlot = Loadable(() => import('./PointsPlot'));
 
 /**
  * A mini game to switch the page background when entered a sequence of symbols matching an encoded body theme.

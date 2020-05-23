@@ -9,7 +9,7 @@ const Layout = ({ location, title, children, largeGame = false }) => {
     <div className="app">
       <header>
         <div className={cx('bgame-wrapper', largeGame && 'bgame-wrapper_large')}>
-          {process.env.browser && <BgGame large={largeGame} />}
+          <BgGame large={largeGame} />
         </div>
 
         <div className="title-wrapper">

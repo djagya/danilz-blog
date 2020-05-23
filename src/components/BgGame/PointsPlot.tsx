@@ -13,7 +13,7 @@ type Game = { won: boolean; points: number; n: number };
  * Plotly.js based graph.
  * @link https://plotly.com/javascript/text-and-annotations/
  */
-export const PointsPlot = ({ gamesHistory }: { gamesHistory: Game[] }) => {
+export default function PointsPlot({ gamesHistory }: { gamesHistory: Game[] }) {
   const gamesPlotData: { x: number[]; y: number[] } = gamesHistory.reduce(
     (acc, game) => ({ x: [...acc.x, game.n], y: [...acc.y, game.points] }),
     {
