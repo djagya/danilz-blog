@@ -4,6 +4,7 @@ Deployed on Netlify:
 
 - Domain: https://blog.danilz.me/
 - Dashboard: https://app.netlify.com/sites/friendly-wescoff-0dfd00/overview
+- Content management via NetlifyCMS: https://blog.danilz.me/admin/
 
 
 ### How to run

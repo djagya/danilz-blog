@@ -30,6 +30,7 @@ const isDev = process.env.NODE_ENV === 'development';
  * Where a theme is encoded like so: [moon, salt, silver].
  *
  * todo: MAAAYBE select a random sequence to guess per game.
+ * todo: Lazy load of the whole game on first click.
  *
  * States:
  * "init" - a random sign is displayed, start game on click
