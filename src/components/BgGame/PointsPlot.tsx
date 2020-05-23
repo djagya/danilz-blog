@@ -56,7 +56,7 @@ export default function PointsPlot({ gamesHistory }: { gamesHistory: Game[] }) {
     yaxis: {
       showgrid: false,
       dtick: 2,
-      range: [Math.floor(lastY - Y_LIMIT / 2), Math.ceil(lastY + Y_LIMIT / 2)],
+      range: [lastY - Math.ceil(Y_LIMIT / 2) - 1, lastY + Math.ceil(Y_LIMIT / 2) + 1],
       tickwidth: 0.1,
       ticklen: 2,
       tickfont: {

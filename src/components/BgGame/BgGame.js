@@ -65,7 +65,7 @@ export default function BgGame({ large = false, debug = false }) {
   //   return () => clearTimeout(t);
   // }, [gamesHistory]);
 
-  const isPlotShown = gamesHistory.filter((game) => game.won).length > 2;
+  const isPlotShown = gamesHistory.filter((game) => game.won).length >= 2;
   const isGameExpanded = isPlotShown || [STATE_PLAY, STATE_FINISH].includes(state);
   const hasWon = () => closestMatch && closestMatch.len === SEQ_LEN;
   const className = state === STATE_FINISH ? (hasWon() ? '_y' : '_n') : null;
