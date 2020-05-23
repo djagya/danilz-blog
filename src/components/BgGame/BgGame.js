@@ -5,8 +5,8 @@ import useAnimationHook from './useAnimationHook';
 import {
   applyTheme,
   flatList,
-  getMatches,
   getRandomThemeSequences,
+  getThemeMatch,
   randomEl,
   randomSigns,
   SIZE,
@@ -14,64 +14,77 @@ import {
 } from './utils';
 import { GameUtils } from './devUtils';
 import { cx } from '../../utils/ui';
+import { PointsPlot } from './PointsPlot';
 
+const STATE_INIT = 'init';
+const STATE_PLAY = 'playing';
+const STATE_FINISH = 'finished';
 const SEQ_LEN = 3;
-const GAMES_TO_LOSE = 15;
+const GAMES_TO_LOSE = 10;
+
 const matchMap = getRandomThemeSequences(SEQ_LEN);
+const isDev = process.env.NODE_ENV === 'development';
 
 /**
  * A mini game to switch the page background when entered a sequence of symbols matching an encoded body theme.
  * Where a theme is encoded like so: [moon, salt, silver].
  *
- * todo: after first win fade in a minimalistic graph (like bustabit) tracking wins (+1) and loses (-1)
- * show N (e.g. 5) on that graph. the graph is below the symbols.
- * todo: after the first win reset the game directly to "playing" after win/lose
  * todo: MAAAYBE select a random sequence to guess per game.
  *
  * States:
  * "init" - a random sign is displayed, start game on click
  * "playing" - sets of random signs (with at least one from not yet inputted themes symbols) are displayed until SEQ_LEN symbols are clicked.
  * "finished" - an animation is running, switch to "init" when finished
- * "resetting" - gradually reset the game via animations
  */
 export default function BgGame({ large = false, debug = false }) {
-  const [state, setState] = useState('init');
+  const [state, setState] = useState(STATE_INIT);
   const [inputSeq, setInputSeq] = useState([]);
   const [closestMatch, setClosestMatch] = useState(null);
   const [activeItems, setActiveItems] = useState([0, 3]);
-  // Game - one click, at some point player loses.
-  const [gamesCount, setGamesCount] = useState(0);
-  const [displaySeq, setDisplaySeq] = useState(randomSigns(SEQ_LEN, flatList(matchMap)));
+  const [attemptsCount, setAttemptsCount] = useState(0);
+  const [displaySeq, setT] = useState(randomSigns(SEQ_LEN, flatList(matchMap)));
 
+  const setDisplaySeq = (v) => {
+    console.log('setting', v);
+    setT(v);
+  };
+
+  const [gamesHistory, setGamesHistory] = useState([
+    // { won: false, points: 0, n: 0 }, // initial game
+  ]);
+
+  // DEBUG
+  // useEffect(() => {
+  //   const t = setTimeout(() => {
+  //     console.log('current history', gamesHistory);
+  //     logGame(Math.random() > 0.5);
+  //   }, 3000);
+  //   return () => clearTimeout(t);
+  // }, [gamesHistory]);
+
+  const isPlotShown = gamesHistory.filter((game) => game.won).length > 2;
+  const isGameExpanded = isPlotShown || [STATE_PLAY, STATE_FINISH].includes(state);
   const hasWon = () => closestMatch && closestMatch.len === SEQ_LEN;
-  const className = state === 'finished' ? (hasWon() ? '_y' : '_n') : null;
+  const className = state === STATE_FINISH ? (hasWon() ? '_y' : '_n') : null;
 
-  useAnimationHook({
-    state,
-    size: SEQ_LEN,
-    triggerState: 'finished',
-    onUpdate: useCallback((v) => setActiveItems(v), [setActiveItems]),
-    onEnd: useCallback(() => {
-      setState('resetting');
-      setClosestMatch(null);
-      setTimeout(() => setState('init'), 1000);
-    }, [setState]),
-  });
+  function resetGame() {
+    setActiveItems([]);
+    setInputSeq([]);
+    setAttemptsCount(0);
+    setClosestMatch(null);
+    setDisplaySeq(randomSigns(SEQ_LEN, flatList(matchMap)));
+    setState(STATE_INIT);
+  }
 
   useEffect(() => {
-    // Generate a display sequence on game start and on input sequence change.
-    if (state === 'init') {
-      setActiveItems([]);
-      setInputSeq([]);
-      setGamesCount(0);
-      setClosestMatch(null);
-    }
     // Allow to enter twice more than the themes sequence size to increase the chances.
-    if (state === 'playing' && gamesCount >= GAMES_TO_LOSE) {
-      setState('finished');
+    if (state === STATE_PLAY && attemptsCount >= GAMES_TO_LOSE) {
+      // Lost.
+      setState(STATE_FINISH);
       setClosestMatch(null);
+      logGame(false);
     }
-  }, [state, gamesCount]);
+  }, [state, attemptsCount]);
 
   /**
    * Find a closest matching theme (starts with one of the input symbols), finish the game if it fully matches.
@@ -80,47 +93,26 @@ export default function BgGame({ large = false, debug = false }) {
    * Match data structure: {theme, from: n, len: m, file: imgSrc}
    */
   useEffect(() => {
-    // Update state if invalid due to the dev utils usage.
-    if (state === 'init' && inputSeq.length) {
-      setState('playing');
-    }
+    const themeMatch = getThemeMatch(inputSeq, matchMap);
+    const isWin = themeMatch && themeMatch['len'] === SEQ_LEN;
 
-    const themeMatch = getThemeMatch(inputSeq);
     setClosestMatch(themeMatch);
+    setDisplaySeq(randomSigns(SEQ_LEN, themeMatch && themeMatch.next ? [themeMatch.next] : flatList(matchMap)));
 
-    if (themeMatch && themeMatch['len'] === SEQ_LEN) {
-      // Guessed all.
-      setState('finished');
+    if (isWin) {
+      setState(STATE_FINISH);
       applyTheme(themeMatch.theme);
-    } else {
-      setDisplaySeq(randomSigns(SEQ_LEN, themeMatch ? [themeMatch['next']] : flatList(matchMap)));
+      logGame(true);
     }
   }, [inputSeq.toString()]);
 
-  const handleClick = (sign) => () => {
-    if (state === 'init') {
-      setState('playing');
-    }
-    if (state === 'playing') {
-      // Append and take last SEQ_LEN elements, like a FIFO queue.
-      const seq = [...inputSeq, sign].slice(-SEQ_LEN);
-      setInputSeq(seq);
-      const themeMatch = getThemeMatch(seq);
-      // Don't count last games if guessed a sign - to allow the player to use that last chance to guess a whole seq.
-      if ((!closestMatch || themeMatch?.theme !== closestMatch.theme) && gamesCount < GAMES_TO_LOSE - 1) {
-        setGamesCount((count) => count + 1);
-      }
-    }
-  };
-
-  function getThemeMatch(seq) {
-    const matches = getMatches(seq, matchMap);
-    if (!matches.length) {
-      return null;
-    }
-    const maxLenSeq = Math.max(...matches.map((m) => m.len));
-    return matches.find((m) => m.len === maxLenSeq);
-  }
+  useAnimationHook({
+    state,
+    size: SEQ_LEN,
+    triggerState: STATE_FINISH,
+    onUpdate: useCallback((v) => setActiveItems(v), [setActiveItems]),
+    onEnd: useCallback(() => resetGame(), [setState]),
+  });
 
   // todo: maybe replace the whole sequence with EndText (with fade animation) - tidy
   return (
@@ -131,21 +123,21 @@ export default function BgGame({ large = false, debug = false }) {
         <SymbolsSet
           sequence={displaySeq}
           activeIndexes={activeItems}
-          highlightEl={closestMatch && closestMatch.next}
-          isInit={state === 'init' || state === 'resetting'}
-          isAnimating={state === 'finished' || state === 'resetting'}
+          highlightEl={isDev && closestMatch && closestMatch.next}
+          expanded={isGameExpanded}
+          isAnimating={[STATE_FINISH].includes(state)}
           className={className}
-          onClick={handleClick}
+          onClickCreator={createClickHandler}
         />
-
-        {state === 'finished' && <EndText won={hasWon()} />}
+        {isPlotShown && <PointsPlot gamesHistory={gamesHistory} />}
+        {state === STATE_FINISH && <EndText won={hasWon()} />}
       </div>
 
-      {debug && process.env.NODE_ENV === 'development' && (
+      {debug && isDev && (
         <div className="game__debug">
           <GameUtils
-            onNew={() => setState('init')}
-            onLose={() => setState('finished')}
+            onNew={() => resetGame()}
+            onLose={() => setState(STATE_FINISH)}
             // Input first N-1 signs, new display seq will have the last one.
             onWin={() => setInputSeq(matchMap[randomEl(THEMES)].slice(0, -1))}
           />
@@ -153,6 +145,46 @@ export default function BgGame({ large = false, debug = false }) {
       )}
     </div>
   );
+
+  function createClickHandler(sign) {
+    return () => {
+      if (state === STATE_INIT) {
+        setState(STATE_PLAY);
+        return;
+      }
+      if (state === STATE_PLAY) {
+        // Append and take last SEQ_LEN elements, like a FIFO queue.
+        const seq = [...inputSeq, sign].slice(-SEQ_LEN);
+        setInputSeq(seq);
+        const themeMatch = getThemeMatch(seq, matchMap);
+        // Don't count last games if guessed a sign - to allow the player to use that last chance to guess a whole seq.
+        if (
+          themeMatch &&
+          (!closestMatch || closestMatch.theme === themeMatch?.theme) &&
+          attemptsCount + 1 >= GAMES_TO_LOSE
+        ) {
+          return;
+        }
+        setAttemptsCount((count) => count + 1);
+      }
+    };
+  }
+
+  function logGame(won) {
+    setGamesHistory((gamesHistory) => {
+      const lastGame = gamesHistory[gamesHistory.length - 1];
+
+      return [
+        ...gamesHistory,
+        {
+          won,
+          // Inc/dec most recent points - from the last game
+          points: (lastGame?.points || 0) + (won ? 1 : -1),
+          n: (lastGame?.n || 0) + 1,
+        },
+      ];
+    });
+  }
 }
 
 const Side = ({ className, showMatched, closestMatch }) => (
@@ -173,18 +205,18 @@ const Side = ({ className, showMatched, closestMatch }) => (
   </div>
 );
 
-const SymbolsSet = ({ sequence, highlightEl, activeIndexes, isAnimating, isInit, className, onClick }) => (
-  <div className={cx('game__sequence', !isInit && '_playing', isAnimating && '_animating')}>
+const SymbolsSet = ({ sequence, highlightEl, activeIndexes, isAnimating, expanded, className, onClickCreator }) => (
+  <div className={cx('game__sequence', expanded && '_playing', isAnimating && '_animating')}>
     {sequence.map((sign, k) => (
       <SvgButton
         key={sign + k}
         alt={sign}
         className={cx(
-          isInit && k === 0 && '_init',
+          !expanded && k === 0 && '_init', // one initial symbol to start the game
           highlightEl === sign && '_choose', // debug class to show next correct button
           activeIndexes.indexOf(k) !== -1 && className,
         )}
-        onClick={onClick(sign)}
+        onClick={onClickCreator(sign)}
       >
         {SIGNS[sign]()}
       </SvgButton>

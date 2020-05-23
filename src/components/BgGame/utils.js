@@ -16,6 +16,15 @@ export const diff = (a = [], b = []) => a.filter((_) => b.indexOf(_) === -1);
 export const unique = (a = []) => a.filter((v, k, s) => s.indexOf(v) === k);
 export const flatList = (map) => Object.keys(map).flatMap(k => map[k]);
 
+export function getThemeMatch(seq, matchMap) {
+  const matches = getMatches(seq, matchMap);
+  if (!matches.length) {
+    return null;
+  }
+  const maxLenSeq = Math.max(...matches.map((m) => m.len));
+  return matches.find((m) => m.len === maxLenSeq);
+}
+
 export function randomSigns(length = 3, mustHave = []) {
   const seq = [];
   while (seq.length < SIZE) {
@@ -24,8 +33,6 @@ export function randomSigns(length = 3, mustHave = []) {
       seq.push(el);
     }
   }
-
-  console.log(`generated, expected one of (${mustHave}): ${seq}`);
 
   return seq;
 }
@@ -61,7 +68,7 @@ export function findSubsequence(inputSeq, matchSeq, theme) {
 }
 
 // Matches must follow in the exact same order as encoded sequences.
-export function getMatches(inputSeq, matchMap) {
+function getMatches(inputSeq, matchMap) {
   return Object.keys(matchMap).reduce((matches, theme) => {
     const matchSequence = findSubsequence(inputSeq, matchMap[theme], theme);
     return matchSequence ? [...matches, matchSequence] : matches;

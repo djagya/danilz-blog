@@ -61,6 +61,11 @@ $shadow-color: #202162;
 .game__main {
   flex: 1 0 auto;
   overflow: hidden;
+
+  .plotly .svg-container {
+    width: $icon-size * 4 !important;
+    height: $icon-size * 2 !important;
+  }
 }
 
 .game__sequence {
@@ -126,7 +131,7 @@ $shadow-color: #202162;
   }
 
   &._choose svg {
-    $c: mix($icon-color, #4527a0, 75%);
+    $c: blue;
     stroke: $c;
     fill: $c;
   }
@@ -173,6 +178,7 @@ $shadow-color: #202162;
     margin-top: 0;
 
     .game__dot {
+      min-width: 5px;
       flex-basis: $icon-size / 3;
     }
 
@@ -207,7 +213,7 @@ $shadow-color: #202162;
     svg {
       fill: $win-color;
       //fill: $dot-color;
-      opacity: .85;
+      opacity: 0.85;
     }
 
     .game__dot__shade {
@@ -246,8 +252,8 @@ $shadow-color: #202162;
 
 .game__dot__shade {
   position: absolute;
-  width: .1px;
-  height: .1px;
+  width: 0.1px;
+  height: 0.1px;
   border-radius: 50%;
   box-shadow: 0 0 3px 2px $shadow-color;
   background-color: $shadow-color;
